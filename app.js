@@ -131,3 +131,19 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)for(const 
 window.addEventListener('online',()=>{for(const key of Object.keys(specs))check(key);});
 (async()=>{await fallback();await Promise.allSettled(Object.keys(specs).map(k=>check(k,true)));initial=false;})();
 })();
+
+/* Meridian navigation: active section state for real, available pages only. */
+(() => {
+  const links=Array.from(document.querySelectorAll('.sidebar-nav a[href^="#"]'));
+  const activate=()=>{
+    const current=links.find(a=>a.getAttribute('href')===location.hash) || links[0];
+    for(const a of links){
+      const selected=a===current;
+      a.classList.toggle('active',selected);
+      if(selected)a.setAttribute('aria-current','page');
+      else a.removeAttribute('aria-current');
+    }
+  };
+  window.addEventListener('hashchange',activate);
+  activate();
+})();
