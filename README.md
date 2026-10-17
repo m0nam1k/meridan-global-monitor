@@ -38,7 +38,7 @@ Run `python -m http.server 8000` from the repository directory and visit `http:/
 - Point markers are only representative locations, **not impacted-area boundaries**; source geometry may be unavailable or generalized.
 - Displayed counts reflect fetched provider records, not all hazards or an independently verified global inventory.
 - Events are advisory data **only**. For immediate danger, always consult local meteorological agencies and emergency authorities.
-- Leaflet tiles use OpenStreetMap/CARTO attribution and require access to the tile service.
+- The dashboard uses OpenStreetMap Standard raster tiles (key-free) with an optional dark CSS filter. Tiles are community-funded and are **not intended for high-volume commercial traffic**; follow https://operations.osmfoundation.org/policies/tiles/ (visible attribution, browser caching, Referer, no bulk downloads). For a production-scale website, subscribe to a commercial tile provider or host your own. CARTO's dark basemap now requires a separate API key and is **not** used by this version.
 
 ## Possible next phase
 
