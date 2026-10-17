@@ -1,45 +1,61 @@
-# AEGIS — Live Global Alert Monitor
+# MERIDIAN — Global Monitor
 
-A GitHub Pages dashboard showing near-real-time earthquake reports, NASA natural-event observations, and official **U.S.** severe-weather alerts.
+> A calm, live view of reported events around the world.
 
-## Live tracking
+MERIDIAN (formerly AEGIS) is a responsive, dark, map-first situational awareness dashboard. It combines **USGS earthquakes**, **NASA EONET open natural events**, and **NOAA/NWS active U.S. weather alerts** on a single public website. The latest design rebuild uses understated dark glass panels, restrained color, and responsive navigation.
 
-**No scheduled GitHub Actions delay.** A visitor's open browser fetches the providers directly:
+**Website:** https://m0nam1k.github.io/aegis-global-alerts/
 
-| Feed | Poll interval while page is visible | Meaning |
+**Repository:** https://github.com/m0nam1k/aegis-global-alerts
+
+> Note: MERIDIAN is currently the product's working brand. The existing repository slug stays `aegis-global-alerts` so GitHub Pages links continue to work; renaming the GitHub repository requires a repository-settings action not exposed to this connector.
+
+## Current, implemented features
+
+- Interactive Leaflet world map with report markers and popups; no map API key
+- Event feed, text search, category and severity filters
+- Counters for reported earthquakes, natural events, U.S. weather alerts, and high/critical report categories
+- Source-health indicators, timestamps, and manual refresh
+- Direct polling from an **open browser tab**, no paid provider credentials:
+  - USGS magnitude 2.5+ feed, every **30 seconds** (provider publishes less often)
+  - NASA EONET active natural events, every **2 minutes**
+  - NOAA active weather alerts, every **60 seconds**
+- Last-known in-memory source data retained during fetch errors; optional committed JSON backup is not live
+
+A "live" result means the browser fetched a provider successfully, **not** that each event is occurring right now. Publication delays, provider caching, geo coverage, access restrictions and API outages apply.
+
+### Planned next phase (NOT implemented)
+
+- **Historical alerts with a 5-hour / 24-hour selector.** This needs actual historical storage or endpoint query support; merely retaining the active feed does not recover expired advisories.
+- **Conflict and geopolitical event coverage**, clearly separated from verified weather/seismic alerts and labeled by publisher and source confidence. Requires suitable evidence-based feeds and a careful deduplication/reliability pipeline.
+- A deeper navigation structure for history, world events, and data provenance.
+- Optional saved areas and notifications after a persistent backend exists.
+
+No war/conflict records, historical archive, or push notifications are fabricated by the current release.
+
+## Deployment
+
+Static GitHub Pages site:
+
+1. Open repository **Settings → Pages**.
+2. Choose **Deploy from a branch**, `main`, `/(root)`.
+3. The live viewer will be at https://m0nam1k.github.io/aegis-global-alerts/.
+4. If an older design remains visible, hard-refresh the browser or wait for Pages deployment to finish.
+
+No GitHub Actions schedule is required for live browser fetching. The action `.github/workflows/refresh.yml` is manual-only and creates an optional stale backup snapshot. GitHub Pages does not continue polling while no visitors have the dashboard open.
+
+## Data interpretation
+
+| Provider | Coverage | Notes |
 | --- | --- | --- |
-| [USGS GeoJSON](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) | **30 seconds** | Earthquakes magnitude 2.5+ over the last 24 hours; USGS feed typically publishes about once per minute |
-| [NASA EONET v3](https://eonet.gsfc.nasa.gov/docs/v3) | **2 minutes** | Curated open natural events from the last 30 days, e.g. wildfires, storms and volcanoes |
-| [NOAA / NWS alerts](https://www.weather.gov/documentation/services-web-alerts) | **60 seconds** | Official active weather watches/warnings for the United States and its territories |
+| [USGS earthquake GeoJSON](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) | Worldwide earthquakes M2.5+ in the past day | The dashboard's magnitude thresholds are illustrative categories, **not official danger ratings**. |
+| [NASA EONET v3](https://eonet.gsfc.nasa.gov/docs/v3) | Natural events curated by NASA | EONET does not provide a universal severity scale; these are *unrated*. |
+| [NOAA/NWS alert API](https://www.weather.gov/documentation/services-web-alerts) | Active weather alerts, U.S. and territories | Not global official weather warning coverage. NOAA feeds may include tests. Severity labels follow source metadata. |
 
-The browser checks at these intervals **while the page remains open and visible**, with immediate checks on initial load and when the tab becomes active after the interval has expired. The refresh button requests all feeds (but cannot bypass source publication latency). A countdown and independent online/offline indicators report the state of each provider. Source failures preserve last good data in the current tab; a saved `data/alerts.json` is also a last-resort **stale fallback** when available.
+Some NOAA records contain no geographic polygon and are shown in the feed without a fabricated pin. For mapped regions, a single marker is **only an approximate representative position** and never substitutes for affected-area boundaries.
 
-This is polling, **not** true server-push/WebSocket alerts, background monitoring, or emergency notification. Closing the website stops checks; no browser notifications are sent. Provider publication, caching, browser throttling, rate limits, CORS restrictions and outages can delay new events. No application can guarantee warnings appear before their original provider publishes them.
+The base map uses OpenStreetMap Standard tiles with a dark visual filter. Follow their [tile usage policy](https://operations.osmfoundation.org/policies/tiles/); use a licensed provider or self-hosting if the project becomes high-traffic or commercial.
 
-## Deploy (GitHub Pages)
+For local development run `python -m http.server 8000` from the repository root and open http://localhost:8000/.
 
-1. Repository: `https://github.com/m0nam1k/aegis-global-alerts`.
-2. Go to **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**, branch **main**, folder **/(root)**, then Save.
-4. Wait for Pages to deploy and check `https://m0nam1k.github.io/aegis-global-alerts/`.
-5. Open the browser's Developer Tools → Network if a source displays Offline: third-party API requests may be blocked by the provider or network.
-
-**Do not run a GitHub Action to get live updates.** `.github/workflows/refresh.yml` is manual-only and writes a backup snapshot when triggered. It is not part of the live refresh loop and is not necessary for the dashboard.
-
-## Local development
-
-Run `python -m http.server 8000` from the repository directory and visit `http://localhost:8000/`. The live feeds require internet access.
-
-## Data integrity & limitations
-
-- **NOAA** weather warnings are U.S.-only, not global official weather-warning coverage. NOAA alert severity is mapped from `Extreme/Severe/Moderate/Minor/Unknown` to `critical/high/moderate/low/unrated`. NOAA alerts without source geometry remain visible in the feed but are not mapped.
-- **USGS** earthquake magnitude bands are convenience categories, **not official emergency threat ratings**.
-- **NASA EONET** tracks observations and does **not** assign an official hazard severity. Shown as *Unrated*.
-- Point markers are only representative locations, **not impacted-area boundaries**; source geometry may be unavailable or generalized.
-- Displayed counts reflect fetched provider records, not all hazards or an independently verified global inventory.
-- Events are advisory data **only**. For immediate danger, always consult local meteorological agencies and emergency authorities.
-- The dashboard uses OpenStreetMap Standard raster tiles (key-free) with an optional dark CSS filter. Tiles are community-funded and are **not intended for high-volume commercial traffic**; follow https://operations.osmfoundation.org/policies/tiles/ (visible attribution, browser caching, Referer, no bulk downloads). For a production-scale website, subscribe to a commercial tile provider or host your own. CARTO's dark basemap now requires a separate API key and is **not** used by this version.
-
-## Possible next phase
-
-For continuous ingestion even with nobody viewing, persistent alert history, worldwide official weather warnings, region-specific push notifications, and automatic health monitoring, deploy an always-running backend (e.g. Node.js worker + database + WebSocket/SSE) using a real server or managed hosting. GitHub Pages alone is a static hosting service.
+**Safety:** MERIDIAN is an informational dashboard, not an official public-warning service. Follow authoritative local advisories and emergency responders.
