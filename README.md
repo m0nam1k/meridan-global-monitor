@@ -1,34 +1,45 @@
-# AEGIS — Global Alert Monitor
+# AEGIS — Live Global Alert Monitor
 
-A responsive, dark global natural-hazard monitor for **GitHub Pages**, built with plain JavaScript and Leaflet. No API keys, build tooling or server required for viewing.
+A GitHub Pages dashboard showing near-real-time earthquake reports, NASA natural-event observations, and official **U.S.** severe-weather alerts.
 
-## Features
-- Interactive OpenStreetMap world map with hazard markers and detail popups
-- USGS earthquakes (magnitude 2.5+ over the past day) and NASA EONET active natural events
-- Filter by category, severity, search text; click any event to fly to it
-- Live source-health indicators, last-updated timestamp, metrics, and mobile layout
-- GitHub Actions refreshes JSON on a 15-minute schedule (subject to GitHub scheduling delays)
-- Stale data preserved during temporary source outages and labeled as such
+## Live tracking
 
-## Deploy to GitHub
-1. Create a **public** GitHub repository and upload all files, keeping `.github/workflows/refresh.yml`.
-2. In **Settings → Actions → General → Workflow permissions**, enable **Read and write permissions** for GitHub Actions (if required).
-3. Open **Actions → Refresh global alerts → Run workflow** to populate the dataset.
-4. In **Settings → Pages**, set **Deploy from a branch**, `main` / `(root)` and save.
-5. Visit `https://YOUR-USERNAME.github.io/YOUR-REPOSITORY/` after Pages publishes.
+**No scheduled GitHub Actions delay.** A visitor's open browser fetches the providers directly:
 
-The dashboard reloads the generated data every 60 seconds and the GitHub Action requests updated feeds every 15 minutes. GitHub Actions scheduled runs can be delayed. This is **near-real-time**, not instantaneous emergency notification.
+| Feed | Poll interval while page is visible | Meaning |
+| --- | --- | --- |
+| [USGS GeoJSON](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) | **30 seconds** | Earthquakes magnitude 2.5+ over the last 24 hours; USGS feed typically publishes about once per minute |
+| [NASA EONET v3](https://eonet.gsfc.nasa.gov/docs/v3) | **2 minutes** | Curated open natural events from the last 30 days, e.g. wildfires, storms and volcanoes |
+| [NOAA / NWS alerts](https://www.weather.gov/documentation/services-web-alerts) | **60 seconds** | Official active weather watches/warnings for the United States and its territories |
+
+The browser checks at these intervals **while the page remains open and visible**, with immediate checks on initial load and when the tab becomes active after the interval has expired. The refresh button requests all feeds (but cannot bypass source publication latency). A countdown and independent online/offline indicators report the state of each provider. Source failures preserve last good data in the current tab; a saved `data/alerts.json` is also a last-resort **stale fallback** when available.
+
+This is polling, **not** true server-push/WebSocket alerts, background monitoring, or emergency notification. Closing the website stops checks; no browser notifications are sent. Provider publication, caching, browser throttling, rate limits, CORS restrictions and outages can delay new events. No application can guarantee warnings appear before their original provider publishes them.
+
+## Deploy (GitHub Pages)
+
+1. Repository: `https://github.com/m0nam1k/aegis-global-alerts`.
+2. Go to **Settings → Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**, branch **main**, folder **/(root)**, then Save.
+4. Wait for Pages to deploy and check `https://m0nam1k.github.io/aegis-global-alerts/`.
+5. Open the browser's Developer Tools → Network if a source displays Offline: third-party API requests may be blocked by the provider or network.
+
+**Do not run a GitHub Action to get live updates.** `.github/workflows/refresh.yml` is manual-only and writes a backup snapshot when triggered. It is not part of the live refresh loop and is not necessary for the dashboard.
 
 ## Local development
-Run `python scripts/fetch.py` to fetch real data, then `python -m http.server 8000` and browse to `http://localhost:8000/`.
 
-## Data / limitations
-- **USGS**: https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php — magnitude-based severity is a visual heuristic, **not** an official threat classification.
-- **NASA EONET**: https://eonet.gsfc.nasa.gov/docs/v3 — active events are observations, and not all are public safety warnings; these show as **Unrated** rather than claiming danger.
-- One point is used per event (for polygons, the first coordinate), so markers are approximate and **do not show affected areas**.
-- Only covered hazard feeds appear: this is not comprehensive worldwide official weather-warning coverage. Data provider omissions, mapping imprecision, and publication lag are expected.
-- This project is **not** an official emergency warning service. Consult local authorities for instructions.
-- Uses OpenStreetMap tiles and Leaflet from CDN; keep map attribution and respect tile usage policy.
+Run `python -m http.server 8000` from the repository directory and visit `http://localhost:8000/`. The live feeds require internet access.
 
-## Next integrations
-GDACS disaster alert levels, official weather alert CAP feeds region-by-region, tsunami bulletins, notifications with opt-in geofencing, event history and deduplication.
+## Data integrity & limitations
+
+- **NOAA** weather warnings are U.S.-only, not global official weather-warning coverage. NOAA alert severity is mapped from `Extreme/Severe/Moderate/Minor/Unknown` to `critical/high/moderate/low/unrated`. NOAA alerts without source geometry remain visible in the feed but are not mapped.
+- **USGS** earthquake magnitude bands are convenience categories, **not official emergency threat ratings**.
+- **NASA EONET** tracks observations and does **not** assign an official hazard severity. Shown as *Unrated*.
+- Point markers are only representative locations, **not impacted-area boundaries**; source geometry may be unavailable or generalized.
+- Displayed counts reflect fetched provider records, not all hazards or an independently verified global inventory.
+- Events are advisory data **only**. For immediate danger, always consult local meteorological agencies and emergency authorities.
+- Leaflet tiles use OpenStreetMap/CARTO attribution and require access to the tile service.
+
+## Possible next phase
+
+For continuous ingestion even with nobody viewing, persistent alert history, worldwide official weather warnings, region-specific push notifications, and automatic health monitoring, deploy an always-running backend (e.g. Node.js worker + database + WebSocket/SSE) using a real server or managed hosting. GitHub Pages alone is a static hosting service.
