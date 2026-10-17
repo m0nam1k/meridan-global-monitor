@@ -1,7 +1,164 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090e18"><title>AEGIS — Global Alerts</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><link rel="stylesheet" href="styles.css?v=20261017-mapfix"></head><body>
-<div class="shell"><aside class="sidebar"><div class="brand"><div class="brand-mark">◈</div><div><div class="brand-name">AEGIS<span class="accent">.</span></div><div class="brand-tag">GLOBAL INTELLIGENCE</div></div></div><div class="nav-label">MONITORING</div><div class="nav active">◉ <span>Global overview</span></div><div class="nav">◎ <span>Live event map</span></div><div class="nav-label second">DATA SOURCES</div><div class="source" id="usgs-status"><span class="source-dot"></span> USGS Earthquakes <span class="source-state">Loading</span></div><div class="source" id="nasa-status"><span class="source-dot"></span> NASA EONET <span class="source-state">Loading</span></div><div class="source" id="noaa-status"><span class="source-dot"></span> NOAA Weather <span class="source-state">Loading</span></div><div class="side-bottom"><div class="side-pulse">● PUBLIC DATA MONITOR</div><p>Information may be delayed or incomplete. Follow local emergency services for safety guidance.</p></div></aside>
-<main><header class="topbar"><div class="breadcrumbs">MONITORING <span>/</span> <b>GLOBAL OVERVIEW</b></div><div class="header-right"><span id="freshness">● CONNECTING</span><span class="utc" id="next-check"></span><span class="utc" id="utc"></span><button class="icon-button" id="refresh" aria-label="Refresh alerts" title="Refresh alerts">↻</button></div></header>
-<div class="content"><section class="headline"><div><div class="eyebrow"><span class="pulse"></span> REAL-WORLD EVENT INTELLIGENCE</div><h1>Global Alert <span>Monitor</span></h1><p>Earthquakes, natural events and U.S. weather warnings. Live polling while this page is open.</p></div><div class="last-update">LAST SUCCESSFUL LIVE CHECK<strong id="updated">Waiting for feed…</strong></div></section>
-<section class="stats"><div class="stat"><div class="stat-label">TRACKED EVENTS <span>◈</span></div><div class="stat-value" id="total">—</div><div class="stat-footer">Current feed records</div></div><div class="stat"><div class="stat-label">EARTHQUAKES <span>⌁</span></div><div class="stat-value" id="quakes">—</div><div class="stat-footer">USGS · last 24 hours</div></div><div class="stat"><div class="stat-label">OTHER NATURAL EVENTS <span>◉</span></div><div class="stat-value" id="natural">—</div><div class="stat-footer">NASA · open events</div></div><div class="stat"><div class="stat-label">WEATHER ALERTS <span>☁</span></div><div class="stat-value" id="weather">—</div><div class="stat-footer">NOAA · active U.S. alerts</div></div><div class="stat"><div class="stat-label">HIGH / CRITICAL ALERTS <span>⚠</span></div><div class="stat-value red" id="high">—</div><div class="stat-footer">Magnitude ≥ 5.0</div></div></section>
-<section class="dashboard"><div class="map-panel"><div class="panel-header"><div><h2>Live hazard map <span class="tiny-label">GLOBAL</span></h2><p>Explore geolocated events worldwide</p></div><span class="map-caption">● EVENT LOCATIONS</span></div><div id="map" role="application" aria-label="Map of global natural hazard events"></div><div class="legend"><span><i style="background:#ef6868"></i> High / critical</span><span><i style="background:#f6b866"></i> Moderate</span><span><i style="background:#52b8dc"></i> Low</span><span><i style="background:#b49bff"></i> Unrated</span></div></div><div class="event-panel"><div class="panel-header event-title"><div><h2>Event feed</h2><p>Latest monitored activity</p></div><span class="counter" id="result-count">0</span></div><div class="filters"><input type="search" id="search" placeholder="⌕  Search events…" aria-label="Search events"><div class="select-row"><select id="category" aria-label="Filter category"><option value="all">All categories</option></select><select id="severity" aria-label="Filter severity"><option value="all">All severity</option><option value="critical">Critical</option><option value="high">High</option><option value="moderate">Moderate</option><option value="low">Low</option><option value="unrated">Unrated</option></select></div></div><div id="events" class="event-list" aria-live="polite"><div class="empty">Loading hazard feeds…</div></div></div></section><footer>AEGIS GLOBAL MONITOR <span>·</span> USGS + NASA EONET + NOAA NWS <span>·</span> Not an emergency alerting authority</footer></div></main></div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="app.js?v=20261017-mapfix"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1016">
+  <meta name="description" content="MERIDIAN is a live world-monitoring dashboard for earthquakes, natural events, and U.S. weather alerts from public sources.">
+  <title>MERIDIAN — Global Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css?v=meridian-1">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="#overview" aria-label="Meridian overview">
+      <span class="brand-symbol" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.55">
+          <circle cx="24" cy="24" r="18"></circle>
+          <ellipse cx="24" cy="24" rx="8" ry="18"></ellipse>
+          <path d="M6 24h36M10 13.5c9 6.5 19 6.5 28 0M10 34.5c9-6.5 19-6.5 28 0"></path>
+          <circle cx="24" cy="24" r="2.5" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </span>
+      <span class="brand-copy"><strong>meridian<span class="brand-period">.</span></strong><small>GLOBAL MONITORING</small></span>
+    </a>
+
+    <div class="sidebar-group">
+      <div class="group-label">WORKSPACE <span>01</span></div>
+      <nav class="sidebar-nav" aria-label="Primary navigation">
+        <a class="nav active" href="#overview" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span>Overview</span>
+        </a>
+        <a class="nav" href="#live-map">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/></svg>
+          <span>Live map</span>
+        </a>
+        <a class="nav" href="#feed">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01" stroke-width="3" stroke-linecap="round"/></svg>
+          <span>Event feed</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="sidebar-group" id="sources">
+      <div class="group-label">DATA NETWORK <span>03</span></div>
+      <div class="source-list">
+        <div class="source" id="usgs-status"><span class="source-dot"></span><span>USGS Earthquakes</span><span class="source-state">Waiting</span></div>
+        <div class="source" id="nasa-status"><span class="source-dot"></span><span>NASA EONET</span><span class="source-state">Waiting</span></div>
+        <div class="source" id="noaa-status"><span class="source-dot"></span><span>NOAA Weather</span><span class="source-state">Waiting</span></div>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <span class="product-version">MERIDIAN / 01</span>
+      <p>Situational awareness, not an official warning service. Always follow local authorities.</p>
+      <a href="https://github.com/m0nam1k/aegis-global-alerts" target="_blank" rel="noopener noreferrer">View source <span aria-hidden="true">↗</span></a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="breadcrumbs"><span>MONITORING</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="m6 4 4 4-4 4"/></svg><b>GLOBAL OVERVIEW</b></div>
+      <div class="header-right">
+        <span class="live-chip" id="freshness">● CONNECTING</span>
+        <span class="topbar-meta" id="next-check">Connecting…</span>
+        <span class="topbar-meta clock" id="utc"></span>
+        <button class="icon-button" id="refresh" type="button" aria-label="Refresh all sources" title="Refresh all sources">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.4-2"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="content" id="overview">
+      <section class="intro">
+        <div class="intro-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span> REAL-TIME GLOBAL OVERVIEW</div>
+          <h1>The world, <em>in focus.</em></h1>
+          <p>Tracking earthquakes, natural events, and U.S. weather alerts through public reporting networks.</p>
+          <div class="intro-meta"><span class="online-mark"><i></i> Monitoring active</span><span class="meta-divider"></span><span>Updates while this page is open</span></div>
+        </div>
+        <div class="last-update"><span>LAST SUCCESSFUL LIVE CHECK</span><strong id="updated">Awaiting provider response</strong></div>
+      </section>
+
+      <section class="stats" aria-label="Event summary">
+        <article class="stat">
+          <div class="stat-label">TOTAL EVENTS <span class="stat-glyph">◉</span></div>
+          <div class="stat-value" id="total">—</div>
+          <div class="stat-footer">Records currently reported</div>
+        </article>
+        <article class="stat">
+          <div class="stat-label">EARTHQUAKES <span class="stat-glyph">≋</span></div>
+          <div class="stat-value" id="quakes">—</div>
+          <div class="stat-footer">USGS · past 24 hours</div>
+        </article>
+        <article class="stat">
+          <div class="stat-label">NATURAL EVENTS <span class="stat-glyph">◎</span></div>
+          <div class="stat-value" id="natural">—</div>
+          <div class="stat-footer">NASA · open events</div>
+        </article>
+        <article class="stat">
+          <div class="stat-label">WEATHER ALERTS <span class="stat-glyph">☷</span></div>
+          <div class="stat-value" id="weather">—</div>
+          <div class="stat-footer">NOAA · active U.S. alerts</div>
+        </article>
+        <article class="stat">
+          <div class="stat-label">HIGH / CRITICAL <span class="stat-glyph">△</span></div>
+          <div class="stat-value severe" id="high">—</div>
+          <div class="stat-footer">Source severity or magnitude*</div>
+        </article>
+      </section>
+
+      <section class="dashboard" aria-label="Live map and event feed">
+        <div class="map-panel surface" id="live-map">
+          <div class="panel-header">
+            <div><div class="panel-kicker">GEOSPATIAL VIEW</div><h2>Live activity map <span class="map-count">WORLDWIDE</span></h2></div>
+            <span class="panel-side-text"><span class="subtle-dot"></span> LOCATIONS REPORTED</span>
+          </div>
+          <div class="map-container">
+            <div id="map" role="application" aria-label="Map of reported global natural hazard events"></div>
+          </div>
+          <div class="map-footer">
+            <div class="legend"><span><i class="legend-critical"></i> High / critical</span><span><i class="legend-medium"></i> Moderate</span><span><i class="legend-low"></i> Low</span><span><i class="legend-unrated"></i> Unrated</span></div>
+            <span class="map-hint">Points are approximate</span>
+          </div>
+        </div>
+
+        <div class="event-panel surface" id="feed">
+          <div class="panel-header">
+            <div><div class="panel-kicker">PUBLIC SOURCE FEEDS</div><h2>Latest activity</h2></div>
+            <span class="counter" id="result-count">0</span>
+          </div>
+          <div class="filters">
+            <div class="search-field">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+              <input type="search" id="search" placeholder="Search events or locations" aria-label="Search events or locations">
+            </div>
+            <div class="select-row">
+              <select id="category" aria-label="Filter event category"><option value="all">All categories</option></select>
+              <select id="severity" aria-label="Filter alert severity">
+                <option value="all">All severities</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="moderate">Moderate</option>
+                <option value="low">Low</option>
+                <option value="unrated">Unrated</option>
+              </select>
+            </div>
+          </div>
+          <div id="events" class="event-list" aria-live="polite"><div class="empty">Connecting to live event feeds…</div></div>
+          <div class="feed-bottom">SELECT ANY EVENT TO LOCATE IT ON THE MAP</div>
+        </div>
+      </section>
+      <footer><span>MERIDIAN · WORLD MONITOR</span><span>* Magnitude and provider severity are not directly comparable. Information may be delayed or incomplete.</span></footer>
+    </div>
+  </main>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js?v=meridian-1"></script>
+</body>
+</html>
