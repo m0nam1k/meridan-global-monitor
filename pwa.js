@@ -47,7 +47,6 @@ feed?.addEventListener('click',e=>{
  else saved[record.id]={id:record.id,title:record.title,source:record.source,category:record.category,url:safeURL(record.url),time:record.time,savedAt:Date.now()};
  persist();
 });
-feed?.addEventListener('keydown',e=>{if(e.target.closest('.save-event'))e.stopPropagation()},true);
 const observer=new MutationObserver(()=>addButtons());
 if(feed)observer.observe(feed,{childList:true});
 function renderSaved(){
