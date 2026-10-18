@@ -105,8 +105,12 @@ if('serviceWorker' in navigator && location.protocol==='https:'){
  }).catch(e=>{console.warn('PWA worker unavailable',e);message('Offline app support could not be installed, but live data may still work.')}))
 }
 $('update-now')?.addEventListener('click',async()=>{
- try{const reg=await navigator.serviceWorker.getRegistration('./');reg?.waiting?.postMessage({type:'SKIP_WAITING'})}catch{}
- location.reload();
+ try{
+  const reg=await navigator.serviceWorker.getRegistration('./');
+  if(!reg?.waiting){location.reload();return}
+  navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload(),{once:true});
+  reg.waiting.postMessage({type:'SKIP_WAITING'});
+ }catch{location.reload()}
 });
 updateControls();
 })();
