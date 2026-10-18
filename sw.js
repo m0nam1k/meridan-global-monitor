@@ -2,7 +2,7 @@
 'use strict';
 const VERSION='meridian-pwa-v1';
 const ASSETS=['./','./index.html','./styles.css?v=pwa1','./app.js?v=pwa1','./pwa.js?v=pwa1','./manifest.webmanifest','./favicon.svg','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./offline.html'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(ASSETS)));self.skipWaiting()});
+self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(ASSETS)))});
 self.addEventListener('activate',e=>{e.waitUntil((async()=>{
 const names=await caches.keys();await Promise.all(names.filter(n=>n.startsWith('meridian-pwa-')&&n!==VERSION).map(n=>caches.delete(n)));await self.clients.claim()})())});
 self.addEventListener('fetch',e=>{
