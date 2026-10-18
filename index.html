@@ -2,17 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b1016">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MERIDIAN">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="icon" sizes="192x192" type="image/png" href="icons/icon-192.png">
+  <link rel="icon" sizes="512x512" type="image/png" href="icons/icon-512.png">
   <meta name="description" content="MERIDIAN is a live world-monitoring dashboard for earthquakes, natural events, and U.S. weather alerts from public sources.">
   <title>MERIDIAN — Global Monitor</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">\n  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="styles.css?v=meridian-1">
+  <link rel="stylesheet" href="styles.css?v=pwa1">
 </head>
 <body>
+<div id="offline-banner" class="offline-banner" role="status" hidden><span>OFFLINE</span> Live alert requests need an internet connection. Saved links are references only.</div>
+<div id="update-banner" class="update-banner" role="status" hidden><span>A newer MERIDIAN version is ready.</span><button id="update-now" type="button">Update</button></div>
 <div class="app-shell">
   <aside class="sidebar">
     <a class="brand" href="#overview" aria-label="Meridian overview">
@@ -43,6 +53,7 @@
           <span>Event feed</span>
         </a>
       </nav>
+      <button type="button" id="saved-open" class="sidebar-saved"><span>☆</span> Saved reports <span class="saved-count" id="saved-count">0</span></button>
     </div>
 
     <div class="sidebar-group" id="sources">
@@ -68,6 +79,7 @@
         <span class="live-chip" id="freshness">● CONNECTING</span>
         <span class="topbar-meta" id="next-check">Connecting…</span>
         <span class="topbar-meta clock" id="utc"></span>
+        <button id="install-button" class="install-button" type="button">Install app <span aria-hidden="true">↗</span></button>
         <button class="icon-button" id="refresh" type="button" aria-label="Refresh all sources" title="Refresh all sources">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 18 7l2 5M4 12l2 5a7 7 0 0 0 12.4-2"/></svg>
         </button>
@@ -149,6 +161,7 @@
                 <option value="unrated">Unrated</option>
               </select>
             </div>
+            <div class="time-filter"><label for="time-range">REPORTED</label><select id="time-range" aria-label="Filter by report age"><option value="all">All current records</option><option value="5">Within 5 hours</option><option value="24">Within 24 hours</option></select></div>
           </div>
           <div id="events" class="event-list" aria-live="polite"><div class="empty">Connecting to live event feeds…</div></div>
           <div class="feed-bottom">SELECT ANY EVENT TO LOCATE IT ON THE MAP</div>
@@ -158,7 +171,26 @@
     </div>
   </main>
 </div>
+<nav class="mobile-dock" aria-label="Mobile app navigation">
+  <a href="#overview" class="active"><span aria-hidden="true">▦</span>Home</a>
+  <a href="#live-map"><span aria-hidden="true">◎</span>Map</a>
+  <a href="#feed"><span aria-hidden="true">☷</span>Feed</a>
+  <button id="saved-open-mobile" type="button"><span aria-hidden="true">☆</span>Saved <small id="saved-count-mobile">0</small></button>
+</nav>
+<section id="install-help" class="install-help" hidden aria-label="Install MERIDIAN instructions">
+  <button id="install-close" type="button" aria-label="Close installation instructions">×</button>
+  <strong>Install MERIDIAN on iPhone</strong>
+  <p>Open this site in Safari. Tap the Share button (square with an upward arrow), select <b>Add to Home Screen</b>, enable <b>Open as Web App</b> if shown, then tap <b>Add</b>.</p>
+  <p class="help-foot">Free to install. The latest alerts require an internet connection.</p>
+</section>
+<p id="pwa-message" class="pwa-message" role="status" hidden></p>
+<dialog id="saved-dialog" class="saved-dialog" aria-label="Saved event references">
+  <div class="saved-dialog-header"><div><span>PERSONAL WATCHLIST</span><h2>Saved reports</h2></div><button id="saved-close" type="button" aria-label="Close saved reports">×</button></div>
+  <p class="saved-note">Saved locally on this device. These are links to source reports, not live or verified warnings.</p>
+  <div id="saved-list"></div>
+</dialog>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js?v=meridian-1"></script>
+<script src="app.js?v=pwa1"></script>
+<script src="pwa.js?v=pwa1"></script>
 </body>
 </html>
