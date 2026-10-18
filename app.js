@@ -57,7 +57,8 @@ async function getJSON(url){
 }
 function draw(){
  const query=$('search').value.trim().toLowerCase(),category=$('category').value,severity=$('severity').value;
- const matches=all.filter(x=>(category==='all'||cat(x)===category)&&(severity==='all'||x.severity===severity)&&(!query||[x.title,x.details,x.source,x.category].some(v=>String(v||'').toLowerCase().includes(query))));
+ const hours=$('time-range')?.value||'all',now=Date.now();
+ const matches=all.filter(x=>(category==='all'||cat(x)===category)&&(severity==='all'||x.severity===severity)&&(!query||[x.title,x.details,x.source,x.category].some(v=>String(v||'').toLowerCase().includes(query)))&&(hours==='all'||(Number.isFinite(Date.parse(x.time))&&Date.parse(x.time)<=now+300000&&now-Date.parse(x.time)<=Number(hours)*3600000)));
  $('result-count').textContent=matches.length.toLocaleString();markers.clearLayers();
  const panel=$('events');panel.replaceChildren();
  if(!matches.length){panel.innerHTML='<div class="empty">No matching alerts. Try another filter or check source status.</div>';return;}
@@ -69,7 +70,7 @@ function draw(){
  }
  const frag=document.createDocumentFragment(),visible=matches.slice(0,350);
  for(const x of visible){
- const row=document.createElement('article');row.className='event'+(newEvents.has(x.id)?' is-new':'');row.tabIndex=0;row.setAttribute('role','button');
+ const row=document.createElement('article');row.className='event'+(newEvents.has(x.id)?' is-new':'');row.tabIndex=0;row.setAttribute('role','button');row.dataset.eventId=x.id;
  row.innerHTML='<div class="event-top"><span class="category">'+escapeHTML(cat(x))+'</span><span class="severity '+escapeHTML(x.severity)+'">'+escapeHTML(x.severity)+'</span></div><h3>'+escapeHTML(x.title)+'</h3><div class="event-meta">'+escapeHTML(fmt(x.time))+' · '+escapeHTML(x.source)+(located(x)?'':' · Not mapped')+(newEvents.has(x.id)?' · NEW':'')+'</div>';
  const action=()=>{if(located(x)&&x._marker){map.flyTo([x.lat,x.lon],Math.max(map.getZoom(),5),{duration:.7});x._marker.openPopup();if(window.innerWidth<1100)$('map').scrollIntoView({behavior:'smooth',block:'center'});}else{const u=safeURL(x.url);if(u!=='#')window.open(u,'_blank','noopener,noreferrer');}};
  row.addEventListener('click',action);row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();action();}});frag.appendChild(row);
@@ -96,6 +97,8 @@ function render(){
  el.title=s.error?'Error: '+s.error:s.success?'Last checked: '+fmt(s.success):'Awaiting live data';
  }
  draw();
+ window.MERIDIAN_ALERTS=all;
+ window.dispatchEvent(new CustomEvent('meridian:data',{detail:{alerts:all}}));
 }
 async function check(key,force=false){
  const s=state[key],cfg=specs[key],now=Date.now();
@@ -118,7 +121,7 @@ async function fallback(){
  render();
  }catch(e){console.info('No snapshot available',e);}
 }
-$('search').addEventListener('input',draw);$('category').addEventListener('change',draw);$('severity').addEventListener('change',draw);
+$('search').addEventListener('input',draw);$('category').addEventListener('change',draw);$('severity').addEventListener('change',draw);$('time-range')?.addEventListener('change',draw);
 $('refresh').addEventListener('click',()=>{for(const key of Object.keys(specs))check(key,true);});
 function clock(){
  $('utc').textContent=new Date().toLocaleTimeString('en-GB',{timeZone:'UTC',hour:'2-digit',minute:'2-digit'})+' UTC';
