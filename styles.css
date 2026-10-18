@@ -193,3 +193,90 @@ footer span:first-child{white-space:nowrap;font-weight:700;letter-spacing:1.15px
   .stat-label{letter-spacing:.3px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+
+/* PWA v1: polished iPhone shell, installation and local bookmarks */
+[hidden]{display:none!important}
+html{overscroll-behavior-y:none}
+body{padding-top:env(safe-area-inset-top,0px);-webkit-tap-highlight-color:transparent}
+button,a,select{touch-action:manipulation}
+.mobile-dock{display:none}
+.offline-banner,.update-banner{
+  position:relative;z-index:30;min-height:39px;display:flex;justify-content:center;align-items:center;
+  padding:8px 15px;gap:12px;background:#44352e;color:#efcfb7;font-size:12px;font-weight:550;text-align:center
+}
+.offline-banner span{font-size:9px;letter-spacing:1.2px;border:1px solid #a27b63;padding:3px 6px;border-radius:4px;font-weight:800}
+.update-banner{background:#213732;color:#c4ded5}
+.update-banner button{border:1px solid #9cbeb1a8;border-radius:7px;background:transparent;color:inherit;padding:5px 13px;font-weight:700}
+.install-button{border:1px solid #aabfb94d;background:linear-gradient(135deg,#bfd2cf25,#718e8630);
+ color:#d7e5e1;padding:8px 13px;border-radius:9px;white-space:nowrap;font-size:11px;font-weight:750}
+.install-button span{margin-left:5px;color:#89ada5}
+.install-button:hover{background:#acc6ba37}
+.sidebar-saved{background:none;border:1px solid transparent;color:#9baeb8;display:flex;align-items:center;gap:12px;
+ width:100%;padding:12px 13px;border-radius:9px;margin-top:6px;text-align:left;font-size:13px;font-weight:600}
+.sidebar-saved:hover{color:#e7eceb;background:#aab9ba14}
+.sidebar-saved>span:first-child{font-size:19px;line-height:1}
+.saved-count{margin-left:auto;border-radius:7px;background:#a3bdb02b;padding:3px 8px;color:#c4dad4;font-size:10px}
+.time-filter{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px}
+.time-filter label{font-size:9px;font-weight:750;letter-spacing:1.3px;color:#8fa2ab}
+.time-filter select{font-size:11px;color:#bdcfd0;background:#152029;border:1px solid #8699a528;border-radius:8px;padding:8px 9px;max-width:175px;min-width:0}
+.event{position:relative;padding-right:52px}
+.save-event{position:absolute;right:10px;top:45px;z-index:1;background:#819ba020;border:1px solid #a0b8b13d;
+ border-radius:9px;width:32px;height:32px;display:grid;place-items:center;color:#a2b4ba;font-size:20px;line-height:1}
+.save-event.saved{color:#e1c6a0;background:#a480542e;border-color:#c6a37655}
+.save-event:hover{background:#738f954d}
+.saved-dialog{position:fixed;z-index:50;width:min(510px,calc(100vw - 30px));max-height:min(75dvh,700px);
+ border:1px solid #728b8c55;border-radius:17px;background:#111a22;color:#e3e9e9;
+ box-shadow:0 30px 100px #0009;padding:0;overflow:auto;overscroll-behavior:contain}
+.saved-dialog::backdrop{background:#020508ba;backdrop-filter:blur(5px)}
+.saved-dialog-header{display:flex;align-items:center;justify-content:space-between;padding:23px 23px 17px;border-bottom:1px solid #ffffff13}
+.saved-dialog-header span{font-size:9px;letter-spacing:1.5px;color:#819ba4}
+.saved-dialog-header h2{font:700 21px Manrope,sans-serif;margin:7px 0 0}
+.saved-dialog-header button,.saved-actions button{border:0;background:none;color:#a4b4bb;font-size:26px;padding:5px}
+.saved-note{padding:14px 23px 5px;color:#92a5ad;font-size:11px;line-height:1.6;margin:0}
+#saved-list{padding:10px 17px 22px}
+.saved-empty{font-size:12px;line-height:1.6;color:#8ca0aa;padding:17px}
+.saved-item{display:flex;justify-content:space-between;gap:12px;padding:15px 8px;border-bottom:1px solid #ffffff13}
+.saved-item span{font-size:10px;letter-spacing:1px;color:#93b5ad;text-transform:uppercase}
+.saved-item h3{font-size:13px;margin:6px 0;color:#e1e9e9;font-weight:650;line-height:1.45}
+.saved-item p{font-size:10px;color:#8497a0;margin:0}
+.saved-actions{display:flex;align-items:center;gap:8px}
+.saved-actions a{font-size:24px;color:#a8c4c0;padding:5px}
+.install-help{position:fixed;z-index:45;bottom:28px;right:24px;width:min(360px,calc(100vw - 30px));background:#1c2a32;border:1px solid #728f905c;border-radius:16px;
+ padding:24px;color:#e8eeee;box-shadow:0 15px 60px #000a}
+.install-help strong{display:block;font:700 17px Manrope,sans-serif;margin-right:32px}
+.install-help p{color:#b4c2c8;font-size:12px;line-height:1.7;margin:12px 0 0}
+.install-help b{color:#f1f6f4}
+.install-help .help-foot{font-size:11px;color:#8da5a9}
+#install-close{position:absolute;right:13px;top:11px;font-size:24px;border:none;background:transparent;color:#c5d3d2}
+.pwa-message{position:fixed;z-index:40;bottom:20px;left:50%;transform:translateX(-50%);
+ width:max-content;max-width:calc(100vw - 30px);background:#263d3c;color:#ddebe8;
+ border:1px solid #749b976a;padding:12px 18px;border-radius:11px;box-shadow:0 8px 25px #0006;font-size:12px;text-align:center}
+.offline .live-chip{color:#dfb49c!important;background:#674e3f57;border-color:#ad806957}
+@media(max-width:1120px){.sidebar-saved{display:none}.topbar{top:0}}
+@media(max-width:700px){
+  body{padding-bottom:calc(73px + env(safe-area-inset-bottom,0px))}
+  .content{padding-bottom:28px}
+  .mobile-dock{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:25;
+    min-height:calc(64px + env(safe-area-inset-bottom,0px));padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px));
+    background:rgba(18,27,35,.94);border-top:1px solid #a4b8bd26;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  .mobile-dock a,.mobile-dock button{display:flex;align-items:center;flex-direction:column;justify-content:center;gap:3px;border:none;border-radius:9px;
+    background:transparent;color:#869aa4;font-size:10px;font-weight:650;text-decoration:none;min-width:0}
+  .mobile-dock span{font-size:22px;line-height:1.1}
+  .mobile-dock .active{color:#c7dcda;background:#93adad12}
+  .mobile-dock small{display:none}
+  .sidebar{min-height:64px}
+  .topbar{top:0}
+  .install-button{font-size:10px;padding:6px 9px}
+  .install-help{bottom:calc(83px + env(safe-area-inset-bottom,0px));right:15px}
+  .pwa-message{bottom:calc(79px + env(safe-area-inset-bottom,0px))}
+  .saved-dialog{max-height:calc(85dvh - env(safe-area-inset-bottom,0px));}
+  #map{height:min(54dvh,490px);min-height:300px}
+  .event-list{max-height:47dvh}
+  .event{min-height:86px;padding-right:52px}
+  .stat{min-height:116px}
+  .map-footer{padding:11px 13px}
+  .legend{row-gap:7px}
+}
+@media(display-mode:standalone){
+  .install-button{display:none}
+}
