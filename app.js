@@ -73,7 +73,7 @@ function draw(){
  const row=document.createElement('article');row.className='event'+(newEvents.has(x.id)?' is-new':'');row.tabIndex=0;row.setAttribute('role','button');row.dataset.eventId=x.id;
  row.innerHTML='<div class="event-top"><span class="category">'+escapeHTML(cat(x))+'</span><span class="severity '+escapeHTML(x.severity)+'">'+escapeHTML(x.severity)+'</span></div><h3>'+escapeHTML(x.title)+'</h3><div class="event-meta">'+escapeHTML(fmt(x.time))+' · '+escapeHTML(x.source)+(located(x)?'':' · Not mapped')+(newEvents.has(x.id)?' · NEW':'')+'</div>';
  const action=()=>{if(located(x)&&x._marker){map.flyTo([x.lat,x.lon],Math.max(map.getZoom(),5),{duration:.7});x._marker.openPopup();if(window.innerWidth<1100)$('map').scrollIntoView({behavior:'smooth',block:'center'});}else{const u=safeURL(x.url);if(u!=='#')window.open(u,'_blank','noopener,noreferrer');}};
- row.addEventListener('click',action);row.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();action();}});frag.appendChild(row);
+ row.addEventListener('click',action);row.addEventListener('keydown',e=>{if(e.target!==row)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();action();}});frag.appendChild(row);
  }
  if(matches.length>visible.length){const note=document.createElement('div');note.className='empty';note.textContent='Showing '+visible.length+' newest of '+matches.length+'. Filter to find older alerts.';frag.appendChild(note);}
  panel.appendChild(frag);
