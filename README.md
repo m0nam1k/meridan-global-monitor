@@ -1,61 +1,62 @@
-# MERIDIAN — Global Monitor
+# MERIDIAN — Global Monitor for iPhone, Android and Web
 
-> A calm, live view of reported events around the world.
+An installable progressive web app (PWA) for situational awareness, built on public earthquake, natural-event and U.S. weather-warning feeds. Install it on an iPhone Home Screen with **no App Store fee**.
 
-MERIDIAN (formerly AEGIS) is a responsive, dark, map-first situational awareness dashboard. It combines **USGS earthquakes**, **NASA EONET open natural events**, and **NOAA/NWS active U.S. weather alerts** on a single public website. The latest design rebuild uses understated dark glass panels, restrained color, and responsive navigation.
+**Live site (current repository slug):** https://m0nam1k.github.io/meridan-global-monitor/
 
-**Website:** https://m0nam1k.github.io/aegis-global-alerts/
+**GitHub repository:** https://github.com/m0nam1k/meridan-global-monitor
 
-**Repository:** https://github.com/m0nam1k/aegis-global-alerts
+> The GitHub slug is currently `meridan` (without the second "i"); the product name and iPhone icon correctly say MERIDIAN. If you change the repository slug again, update links and verify GitHub Pages deployment.
 
-> Note: MERIDIAN is currently the product's working brand. The existing repository slug stays `aegis-global-alerts` so GitHub Pages links continue to work; renaming the GitHub repository requires a repository-settings action not exposed to this connector.
+## Install on iPhone
 
-## Current, implemented features
+1. Open the live link in **Safari** on iPhone.
+2. Tap **Share** (the square with an upward arrow). In some Safari layouts, open the Page Menu and then Share.
+3. Select **Add to Home Screen**.
+4. Leave **Open as Web App** enabled if that switch is presented.
+5. Choose **Add**. Launch MERIDIAN from the Home Screen.
 
-- Interactive Leaflet world map with report markers and popups; no map API key
-- Event feed, text search, category and severity filters
-- Counters for reported earthquakes, natural events, U.S. weather alerts, and high/critical report categories
-- Source-health indicators, timestamps, and manual refresh
-- Direct polling from an **open browser tab**, no paid provider credentials:
-  - USGS magnitude 2.5+ feed, every **30 seconds** (provider publishes less often)
-  - NASA EONET active natural events, every **2 minutes**
-  - NOAA active weather alerts, every **60 seconds**
-- Last-known in-memory source data retained during fetch errors; optional committed JSON backup is not live
+MERIDIAN launches in standalone app mode with a custom 180px iPhone icon, native screen safe areas and bottom navigation. Android/Chromium browsers can install it using their browser menu or the Install app button.
 
-A "live" result means the browser fetched a provider successfully, **not** that each event is occurring right now. Publication delays, provider caching, geo coverage, access restrictions and API outages apply.
+The PWA is **not** an App Store listing and does not require an Apple Developer Program membership.
 
-### Planned next phase (NOT implemented)
+## Features included
 
-- **Historical alerts with a 5-hour / 24-hour selector.** This needs actual historical storage or endpoint query support; merely retaining the active feed does not recover expired advisories.
-- **Conflict and geopolitical event coverage**, clearly separated from verified weather/seismic alerts and labeled by publisher and source confidence. Requires suitable evidence-based feeds and a careful deduplication/reliability pipeline.
-- A deeper navigation structure for history, world events, and data provenance.
-- Optional saved areas and notifications after a persistent backend exists.
+- Live browser polling: USGS magnitude 2.5+ earthquakes every 30 seconds, NASA EONET active natural events every 2 minutes, NOAA active U.S. weather alerts every 60 seconds.
+- Full-screen world map, event list, category and severity filters.
+- **Reported within the last 5 or 24 hours** filters, applied to currently returned provider records. This is not a complete archive of expired alerts.
+- **Saved report links** kept locally on the current device in localStorage, up to 80. They are references, not continuously monitored alerts.
+- Install manifest, 192px/512px PWA icons and 180px iOS icon, offline shell, versioned static-cache strategy, app update prompt.
+- Offline warning with **no caching of official API responses** by the service worker. Live reports are only live after successful network requests.
+- Responsive mobile dock, safer iPhone notches and home-indicator insets, dark semi-transparent UI.
 
-No war/conflict records, historical archive, or push notifications are fabricated by the current release.
+## Important data and safety limitations
 
-## Deployment
+- GitHub Pages is static hosting. The browser fetches sources only while MERIDIAN is open. Closing the app stops collection; there are **no push notifications** or automatic background monitoring.
+- USGS data is global; NOAA active weather warnings are U.S. and territories only; NASA EONET lists curated open natural events worldwide.
+- Provider feeds are not guaranteed instantaneous and may suffer publication delays, rate limits or cross-origin failures.
+- USGS magnitude-based `high/critical` tags are a dashboard heuristic, **not an official impact classification**. NASA events are explicitly unrated.
+- Map pins are representative points, never affected-area polygons. NOAA warnings lacking geometry remain visible but unmapped.
+- A prior `data/alerts.json` may be shown as a **fallback reference**, but the dashboard's source indicators do not mark it live. There is no full historical database.
+- MERIDIAN is not a safety-critical emergency warning platform. Follow official emergency authorities.
+- OpenStreetMap community-funded raster tiles are acceptable for development with proper attribution, but high traffic needs licensed tiles or self-hosting: https://operations.osmfoundation.org/policies/tiles/
 
-Static GitHub Pages site:
+## How the PWA works
 
-1. Open repository **Settings → Pages**.
-2. Choose **Deploy from a branch**, `main`, `/(root)`.
-3. The live viewer will be at https://m0nam1k.github.io/aegis-global-alerts/.
-4. If an older design remains visible, hard-refresh the browser or wait for Pages deployment to finish.
+- `manifest.webmanifest`: app name, standalone display, icons, in-scope launch URL.
+- `sw.js`: caches only same-origin static UI resources, network-first navigation, never intercepts USGS/NASA/NOAA/tiles.
+- `pwa.js`: install instructions and browser installation flow, network banners, app updates, saved reports.
+- `app.js`: original live-map feed logic and 5h/24h report filters.
+- `styles.css`: desktop and native-feeling iPhone layout.
 
-No GitHub Actions schedule is required for live browser fetching. The action `.github/workflows/refresh.yml` is manual-only and creates an optional stale backup snapshot. GitHub Pages does not continue polling while no visitors have the dashboard open.
+### Test locally
 
-## Data interpretation
+Use a local HTTP server in the project folder: `python -m http.server 8000`, then open http://localhost:8000/ . Offline Service Worker features work on localhost or HTTPS; GitHub Pages provides HTTPS.
 
-| Provider | Coverage | Notes |
-| --- | --- | --- |
-| [USGS earthquake GeoJSON](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) | Worldwide earthquakes M2.5+ in the past day | The dashboard's magnitude thresholds are illustrative categories, **not official danger ratings**. |
-| [NASA EONET v3](https://eonet.gsfc.nasa.gov/docs/v3) | Natural events curated by NASA | EONET does not provide a universal severity scale; these are *unrated*. |
-| [NOAA/NWS alert API](https://www.weather.gov/documentation/services-web-alerts) | Active weather alerts, U.S. and territories | Not global official weather warning coverage. NOAA feeds may include tests. Severity labels follow source metadata. |
+### Deploy
 
-Some NOAA records contain no geographic polygon and are shown in the feed without a fabricated pin. For mapped regions, a single marker is **only an approximate representative position** and never substitutes for affected-area boundaries.
+GitHub Pages must be enabled in **Settings → Pages**, using the `main` branch and `/(root)` folder. GitHub deploys after the commit. If updates appear stuck, wait for deployment and reload the app; the service worker may show an update prompt.
 
-The base map uses OpenStreetMap Standard tiles with a dark visual filter. Follow their [tile usage policy](https://operations.osmfoundation.org/policies/tiles/); use a licensed provider or self-hosting if the project becomes high-traffic or commercial.
+## Next phase
 
-For local development run `python -m http.server 8000` from the repository root and open http://localhost:8000/.
-
-**Safety:** MERIDIAN is an informational dashboard, not an official public-warning service. Follow authoritative local advisories and emergency responders.
+To achieve a genuine always-on worldwide alert platform: add an ingestion backend, persisted history (including expired alerts), data-source provenance, vetted conflict/geopolitical feeds, reliable event deduplication and consent-based push notifications. None of those capabilities should be claimed before they exist.
