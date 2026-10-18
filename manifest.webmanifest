@@ -1,0 +1,47 @@
+{
+  "name": "MERIDIAN — Global Monitor",
+  "short_name": "MERIDIAN",
+  "description": "Global hazard monitoring from public USGS, NASA and NOAA feeds.",
+  "id": "./",
+  "start_url": "./?source=homescreen",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1016",
+  "theme_color": "#0b1016",
+  "lang": "en",
+  "categories": [
+    "news",
+    "weather",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "World map",
+      "url": "./#live-map"
+    },
+    {
+      "name": "Live feed",
+      "url": "./#feed"
+    }
+  ]
+}
